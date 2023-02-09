@@ -72,7 +72,7 @@ import Form from "./components/Form.vue";
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@200&family=Monoton&display=swap");
 .thai-p {
   font-family: "Kanit", sans-serif;

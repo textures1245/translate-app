@@ -266,4 +266,4 @@ export default {
     </section>
   </div>
 </template>
-<style lang="scss"></style>
+<style lang="css"></style>
