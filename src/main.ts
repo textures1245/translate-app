@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import './style.css'
+import './style.scss'
 import '@picocss/pico'
 import App from './App.vue'
 

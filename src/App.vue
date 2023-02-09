@@ -1,172 +1,17 @@
 <script lang="ts">
 import axios from "axios";
+import { ref } from "vue";
 
 export default {
   data() {
     return {
-      onLoaded: false,
-      encodedParams: new URLSearchParams(),
-      options: {
-        method: "",
-        url: "",
-        headers: {
-          "Accept-Encoding": "application/gzip",
-          "X-RapidAPI-Key":
-            "84214a2573msh8eef85f0805fb7bp11f306jsn01780e8a3986",
-          "X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
-        },
-      },
-      translatedObj: {
-        translatedText: "",
-        text: "",
-        source: "",
-        target: "",
-      },
-      targetOpts: [
-        {
-          language: "",
-        },
-      ],
+      themeStyles: {},
+      logMsg: ref(""),
+      loading: false,
+      myTheme: ref("dark"),
     };
   },
-  watch: {
-    "translatedObj.target"(newtarget) {
-      if (newtarget !== "") {
-        this.translatedObj.translatedText = "";
-        this.translatedObj.target = newtarget;
-        console.log(this.translatedObj.target);
-      }
-    },
-
-    "translatedObj.text"() {
-      this.translatedObj.translatedText = "";
-    },
-  },
-  mounted() {
-    this.fetchtargetLang();
-  },
-  methods: {
-    async fetchtargetLang() {
-      const apiTarget =
-        "https://google-translate1.p.rapidapi.com/language/translate/v2/languages";
-      this.options.url = apiTarget;
-      this.options.method = "GET";
-      axios.request(this.options).then((res) => {
-        try {
-          this.targetOpts = res.data.data.languages;
-          console.log(this.targetOpts);
-        } catch (err) {
-          console.error(err);
-        }
-      });
-      this.options.url = "";
-      this.options.method = "";
-    },
-    async onDetectedLang(text: string) {
-      const apiTarget =
-        "https://google-translate1.p.rapidapi.com/language/translate/v2/detect";
-      this.options.url = apiTarget;
-      this.options.method = "POST";
-
-      if (this.translatedObj.text) {
-        this.encodedParams.append("q", text);
-
-        //- assigned return content type
-        Object.assign(this.options.headers, {
-          "content-type": "application/x-www-form-urlencoded",
-        });
-        Object.assign(this.options, {
-          data: this.encodedParams,
-        });
-
-        await axios
-          .request(this.options)
-          .then((response) => {
-            try {
-              this.translatedObj.source =
-                response.data.data.detections[0][0].language;
-              console.log(this.translatedObj.source);
-
-              //* reset
-              this.encodedParams = new URLSearchParams(); // reset params
-              this.options.url = "";
-              this.options.method = "";
-
-              this.onTranslated().then(() => {
-                console.log("Translated Success");
-              });
-            } catch (err) {
-              console.error(err);
-            }
-          })
-          .catch(function (error) {
-            console.error(error);
-          });
-      } else {
-        console.log("text not found");
-      }
-    },
-
-    async onTranslated() {
-      this.options.url =
-        "https://google-translate1.p.rapidapi.com/language/translate/v2";
-      this.options.method = "POST";
-
-      if (this.translatedObj) {
-        try {
-          this.encodedParams.append("q", this.translatedObj.text);
-          this.encodedParams.append("target", this.translatedObj.target);
-          this.encodedParams.append("source", this.translatedObj.source);
-          Object.assign(this.options, {
-            data: this.encodedParams,
-          });
-
-          axios
-            .request(this.options)
-            .then((response) => {
-              try {
-                console.log(response.data);
-                console.log(response.data.data.translations[0]);
-                this.translatedObj.translatedText =
-                  response.data.data.translations[0].translatedText;
-                console.log(this.translatedObj.translatedText);
-              } catch (err) {
-                console.error(err);
-              }
-            })
-            .catch(function (error) {
-              console.error(error);
-            });
-        } catch (err) {
-          console.error(err);
-        }
-      } else {
-        console.error("Object not found!");
-      }
-
-      //- resets
-      this.encodedParams = new URLSearchParams(); // reset params
-      this.options.url = "";
-      this.options.method = "";
-
-      //- reset both input and headers
-      this.options.headers = {
-        "Accept-Encoding": "application/gzip",
-        "X-RapidAPI-Key": "84214a2573msh8eef85f0805fb7bp11f306jsn01780e8a3986",
-        "X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
-      };
-    },
-
-    async onSubmitTranslated() {
-      this.onLoaded = true;
-      await this.onDetectedLang(this.translatedObj.text).then(() => {
-        console.log(
-          `detected! on lang on ${this.translatedObj.target} then translated to ${this.translatedObj.source} `
-        );
-        this.onLoaded = false;
-      });
-    },
-  },
+  emits: ["logMessage"],
 };
 </script>
 
@@ -175,47 +20,86 @@ import Form from "./components/Form.vue";
 </script>
 
 <template>
-  <header></header>
-  <section></section>
-  <main class="container">
-    <h1>Translate Me!</h1>
-    <hr />
-    <div>
-      <form @submit.prevent="onSubmitTranslated">
-        <select
-          required
-          v-if="targetOpts.length > 0"
-          name="target"
-          v-model="translatedObj.target"
-          id="target"
+  <div
+    :data-theme="myTheme"
+    :class="myTheme === 'light' ? 'light-bg' : 'dark-bg'"
+    style="height: 100%; width: 100%; position: absolute"
+  >
+    <header></header>
+    <section></section>
+    <main class="container">
+      <details>
+        <summary>📣 ข้อความสำคัญโปรดอ่านด้วยครับ</summary>
+        <p style="text-align: center" class="container thai-p">
+          สวัสดีครับอาจาร์ย ถ้าเกิดอาจาร์ยเห็น message ด้านล่างขวา
+          เขียนประมาณว่า "You have exceeded the MONTHLY quota for Characters on
+          your current plan, BASIC" ไม่ใช่ว่า app ผมมันทำงานไม่ได้นะครับ
+          แต่หมายความ API ที่ใช่มันเกิน limit ที่ว่ามาแล้วในเดือนนี้ (500
+          requests per month) ถ้าอาจาร์ยมาตรวจงานในเดือน ก.พ นี้
+          รบกวนช่วยมาตรวจอีกทีในวันที่ 10 มี.ค ด้วยครับ
+          ขออภัยในความไม่สะดวกด้วยนะครับ ขอบคุณครับ 🙏
+        </p>
+      </details>
+      <div class="flex-inline">
+        <div class="">
+          <h1>Translate Me!</h1>
+        </div>
+        <div
+          class="btn"
+          @click="
+            () =>
+              myTheme === 'light' ? (myTheme = 'dark') : (myTheme = 'light')
+          "
         >
-          <option :value="s.language" v-for="s in targetOpts">
-            {{ s.language }}
-          </option>
-        </select>
-        <input
-          required
-          type="text"
-          v-model="translatedObj.text"
-          placeholder="Type something you want to translate!"
-        />
-        <button type="submit" role="button">Translate it!</button>
-      </form>
-      <section v-if="onLoaded">
-        <progress></progress>
-      </section>
-      <section v-if="translatedObj.translatedText">
-        <details>
-          <summary>Translate: {{ translatedObj.translatedText }}</summary>
-          <ul>
-            <li>Language Input Detect: {{ translatedObj.source }}</li>
-            <li>Language to Translated {{ translatedObj.target }}</li>
-            <li>Original text: {{ translatedObj.text }}</li>
-          </ul>
-        </details>
-      </section>
-    </div>
-  </main>
+          <a role="button" style="text-transform: uppercase">{{ myTheme }}</a>
+        </div>
+      </div>
+      <hr />
+      <Form
+        @log-message="(msg: string, loaded?: boolean) => (logMsg = msg)"
+      ></Form>
+    </main>
+    <footer class="buttom">
+      <button
+        v-if="logMsg !== ''"
+        role="button"
+        aria-busy="true"
+        class="secondary outline"
+      >
+        {{ logMsg }}
+      </button>
+    </footer>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@200&family=Monoton&display=swap");
+.thai-p {
+  font-family: "Kanit", sans-serif;
+}
+
+.light-bg {
+  background-color: #fff;
+}
+
+.dark-bg {
+  background-color: #111920;
+}
+
+.buttom {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  cursor: pointer;
+}
+
+.flex-inline {
+  display: flex;
+  gap: 2rem;
+}
+</style>
