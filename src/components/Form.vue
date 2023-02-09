@@ -15,7 +15,7 @@ export default {
         headers: {
           "Accept-Encoding": "application/gzip",
           "X-RapidAPI-Key":
-            "84214a2573msh8eef85f0805fb7bp11f306jsn01780e8a3986",
+            "76c2d6824emsh545f738d51c9119p1b26e7jsnb146b260feec",
           "X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
         },
       },
@@ -183,7 +183,7 @@ export default {
       //- reset both input and headers
       this.options.headers = {
         "Accept-Encoding": "application/gzip",
-        "X-RapidAPI-Key": "84214a2573msh8eef85f0805fb7bp11f306jsn01780e8a3986",
+        "X-RapidAPI-Key": "76c2d6824emsh545f738d51c9119p1b26e7jsnb146b260feec",
         "X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
       };
     },
