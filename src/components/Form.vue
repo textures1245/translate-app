@@ -2,9 +2,10 @@
 import axios from "axios";
 import { AxiosError } from "axios";
 import { defineAsyncComponent } from "vue";
+const apiKey = import.meta.env.VITE_APP_APIKEY;
 
 export default {
-  setup() {},
+  setup() { },
   data() {
     return {
       onLoaded: false,
@@ -14,8 +15,7 @@ export default {
         url: "",
         headers: {
           "Accept-Encoding": "application/gzip",
-          "X-RapidAPI-Key":
-            "76c2d6824emsh545f738d51c9119p1b26e7jsnb146b260feec",
+          "X-RapidAPI-Key": apiKey,
           "X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
         },
       },
